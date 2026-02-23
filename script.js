@@ -4,7 +4,7 @@ let running = false;
 let activeTask = null;
 
 /* GOOGLE SCRIPT URL */
-const scriptURL = "https://script.google.com/macros/s/AKfycbyVnWQ6kfoszV4Bij-KA0tsWgfeLhU6D6rcr61SCXeZyxYXxfikvLwz067o1nMLcAF_ow/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzVmqKd319ir49Aidjk70qgY1vj6SjiBupo4lCGCmC9dpajMqAYNSBTplvaavLOhE_cBw/exec";
 
 /* GET ELEMENTS */
 const taskForm = document.getElementById("taskForm");
@@ -168,4 +168,5 @@ themeToggle.addEventListener("click", () => {
     localStorage.setItem("theme","light");
     themeToggle.textContent = "🌙";
   }
+
 });
