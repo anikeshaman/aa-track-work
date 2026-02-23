@@ -90,3 +90,27 @@ textarea{min-height:80px;resize:vertical;}
     font-size: 20px;
   }
 }
+/* DARK MODE */
+body.dark {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+body.dark .card {
+  background: #1e293b;
+}
+
+body.dark input,
+body.dark textarea {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+body.dark .btn.primary {
+  background: #22c55e;
+}
+
+body.dark .history {
+  background: #1e293b;
+}S
