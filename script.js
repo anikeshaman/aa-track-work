@@ -168,3 +168,4 @@ function addToHistory(task){
   historyList.prepend(div);
 }
 
+
