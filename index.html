@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AA Track</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo-wrap" title="Made by Anikesh Aman">
+    <div class="logo-box">A<span>2</span></div>
+    <div class="logo-text">AA Track</div>
+  </div>
+  <button id="themeToggle" class="theme-btn">🌙</button>
+</header>
+
+<main class="container">
+
+<!-- TIMER -->
+<section class="card">
+  <div class="timer-display" id="timer">00:00:00</div>
+
+  <div class="timer-buttons">
+    <button id="stopBtn" class="btn">Stop</button>
+  </div>
+
+  <div class="status" id="status">Idle</div>
+</section>
+
+<!-- FORM -->
+<section class="card">
+  <h2>New Task</h2>
+  <form id="taskForm">
+
+    <label>User ID</label>
+    <input type="text" id="userId" required>
+
+    <label>User Name</label>
+    <input type="text" id="userName" required>
+
+    <label>Date</label>
+    <input type="date" id="date" required>
+
+    <label>Task Name</label>
+    <textarea id="taskName" required></textarea>
+
+    <label>Task Link (optional)</label>
+    <input type="url" id="taskLink">
+
+    <label>Additional Comments (optional)</label>
+    <textarea id="comments"></textarea>
+
+    <button type="submit" class="btn primary full">Set Task</button>
+    <div id="message" class="message"></div>
+
+  </form>
+</section>
+
+</main>
+
+<section class="card history">
+  <h2>Task History</h2>
+  <div id="historyList">No tasks tracked yet</div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
