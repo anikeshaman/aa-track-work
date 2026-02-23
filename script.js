@@ -3,7 +3,7 @@ let timer = null;
 let running = false;
 let activeTask = null;
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbzVmqKd319ir49Aidjk70qgY1vj6SjiBupo4lCGCmC9dpajMqAYNSBTplvaavLOhE_cBw/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzGxw0nGPwcWGlvKknlOwMOvsiu9Oc7IACxYHloTlnZaRqjrE84ZkwSF0ENk2L0lbFe_g/exec";
 
 /* ELEMENTS */
 const taskForm = document.getElementById("taskForm");
@@ -155,3 +155,4 @@ function addToHistory(task){
   `;
   historyList.prepend(div);
 }
+
