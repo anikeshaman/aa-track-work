@@ -3,25 +3,34 @@ let timer = null;
 let running = false;
 let activeTask = null;
 
-/* GOOGLE SCRIPT URL */
 const scriptURL = "https://script.google.com/macros/s/AKfycbzVmqKd319ir49Aidjk70qgY1vj6SjiBupo4lCGCmC9dpajMqAYNSBTplvaavLOhE_cBw/exec";
 
-/* GET ELEMENTS */
+/* ELEMENTS */
 const taskForm = document.getElementById("taskForm");
 const timerDisplay = document.getElementById("timer");
 const statusText = document.getElementById("status");
 const message = document.getElementById("message");
 const stopBtn = document.getElementById("stopBtn");
 const historyList = document.getElementById("historyList");
-const themeToggle = document.getElementById("themeToggle");
 
-/* FORM FIELDS */
 const userId = document.getElementById("userId");
 const userName = document.getElementById("userName");
 const date = document.getElementById("date");
 const taskName = document.getElementById("taskName");
 const taskLink = document.getElementById("taskLink");
 const comments = document.getElementById("comments");
+
+/* AUTO DATE */
+date.valueAsDate = new Date();
+
+/* LOAD SAVED USER */
+if (localStorage.getItem("aa_user")) {
+  const user = JSON.parse(localStorage.getItem("aa_user"));
+  userId.value = user.userId;
+  userName.value = user.userName;
+  userId.disabled = true;
+  userName.disabled = true;
+}
 
 /* TIME FORMAT */
 function formatTime(sec){
@@ -36,11 +45,13 @@ function getCurrentTime(){
 }
 
 function lockForm(lock){
-  document.querySelectorAll("#taskForm input, #taskForm textarea, #taskForm button")
-    .forEach(el => el.disabled = lock);
+  taskName.disabled = lock;
+  taskLink.disabled = lock;
+  comments.disabled = lock;
+  taskForm.querySelector("button").disabled = lock;
 }
 
-/* SET TASK → START TIMER */
+/* START TASK */
 taskForm.addEventListener("submit", e => {
   e.preventDefault();
 
@@ -49,10 +60,16 @@ taskForm.addEventListener("submit", e => {
     return;
   }
 
-  if(!userId.value || !userName.value || !date.value || !taskName.value){
-    message.textContent = "Fill all required fields ❗";
+  if(!userId.value || !userName.value || !taskName.value){
+    message.textContent = "Fill required fields ❗";
     return;
   }
+
+  /* SAVE USER ONCE */
+  localStorage.setItem("aa_user", JSON.stringify({
+    userId: userId.value,
+    userName: userName.value
+  }));
 
   activeTask = {
     userId: userId.value,
@@ -69,7 +86,6 @@ taskForm.addEventListener("submit", e => {
 
   running = true;
   statusText.textContent = "Running";
-
   lockForm(true);
 
   timer = setInterval(() => {
@@ -80,9 +96,8 @@ taskForm.addEventListener("submit", e => {
   message.textContent = "Task started ▶";
 });
 
-/* STOP → SAVE */
+/* STOP TASK */
 stopBtn.addEventListener("click", async () => {
-
   if(!running){
     message.textContent = "No task running ❗";
     return;
@@ -96,36 +111,28 @@ stopBtn.addEventListener("click", async () => {
   activeTask.duration = formatTime(seconds);
 
   try{
-
     const formData = new URLSearchParams();
-
-    formData.append("userId", activeTask.userId);
-    formData.append("userName", activeTask.userName);
-    formData.append("date", activeTask.date);
-    formData.append("taskName", activeTask.taskName);
-    formData.append("taskLink", activeTask.taskLink);
-    formData.append("comments", activeTask.comments);
-    formData.append("startTime", activeTask.startTime);
-    formData.append("endTime", activeTask.endTime);
-    formData.append("duration", activeTask.duration);
+    for (const key in activeTask) {
+      formData.append(key, activeTask[key]);
+    }
 
     await fetch(scriptURL, {
       method: "POST",
-      body: formData,
-      mode: "no-cors"   // 🔥 REQUIRED FOR APPS SCRIPT
+      body: formData
     });
 
     addToHistory(activeTask);
     message.textContent = "Task saved ✅";
 
-  }catch(error){
-    console.error(error);
+  }catch{
     message.textContent = "Error saving task ❌";
   }
 
-  taskForm.reset();
-  lockForm(false);
+  taskName.value = "";
+  taskLink.value = "";
+  comments.value = "";
 
+  lockForm(false);
   timerDisplay.textContent = "00:00:00";
   seconds = 0;
   activeTask = null;
@@ -133,14 +140,12 @@ stopBtn.addEventListener("click", async () => {
 
 /* HISTORY */
 function addToHistory(task){
-
   if(historyList.textContent === "No tasks tracked yet"){
     historyList.textContent = "";
   }
 
   const div = document.createElement("div");
   div.className = "task-item";
-
   div.innerHTML = `
     <strong>${task.date}</strong> | ${task.userName}<br>
     ${task.taskName}<br>
@@ -148,25 +153,5 @@ function addToHistory(task){
     ${task.taskLink ? `🔗 <a href="${task.taskLink}" target="_blank">Open Link</a><br>` : ""}
     ${task.comments ? `📝 ${task.comments}` : ""}
   `;
-
   historyList.prepend(div);
 }
-
-/* DARK MODE */
-if(localStorage.getItem("theme") === "dark"){
-  document.body.classList.add("dark");
-  themeToggle.textContent = "☀️";
-}
-
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-
-  if(document.body.classList.contains("dark")){
-    localStorage.setItem("theme","dark");
-    themeToggle.textContent = "☀️";
-  }else{
-    localStorage.setItem("theme","light");
-    themeToggle.textContent = "🌙";
-  }
-
-});
