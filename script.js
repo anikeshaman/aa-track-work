@@ -76,8 +76,8 @@ taskForm.addEventListener("submit", e => {
     userName: userName.value,
     date: date.value,
     taskName: taskName.value,
-    taskLink: taskLink.value,
-    comments: comments.value,
+    taskLink: taskLink.value || "",
+    comments: comments.value || "",
     startTime: getCurrentTime()
   };
 
@@ -86,14 +86,14 @@ taskForm.addEventListener("submit", e => {
 
   running = true;
   statusText.textContent = "Running";
+  message.textContent = "Task started ▶";
+
   lockForm(true);
 
   timer = setInterval(() => {
     seconds++;
     timerDisplay.textContent = formatTime(seconds);
   }, 1000);
-
-  message.textContent = "Task started ▶";
 });
 
 /* STOP TASK */
@@ -112,22 +112,32 @@ stopBtn.addEventListener("click", async () => {
 
   try{
     const formData = new URLSearchParams();
-    for (const key in activeTask) {
-      formData.append(key, activeTask[key]);
-    }
 
-    await fetch(scriptURL, {
+    Object.keys(activeTask).forEach(key => {
+      formData.append(key, activeTask[key]);
+    });
+
+    const response = await fetch(scriptURL, {
       method: "POST",
       body: formData
     });
 
-    addToHistory(activeTask);
-    message.textContent = "Task saved ✅";
+    const result = await response.text();
 
-  }catch{
-    message.textContent = "Error saving task ❌";
+    if(result.includes("Success")){
+      addToHistory(activeTask);
+      message.textContent = "Task saved ✅";
+    }else{
+      message.textContent = "Sheet error ❌";
+      console.error(result);
+    }
+
+  }catch(error){
+    message.textContent = "Network/API error ❌";
+    console.error(error);
   }
 
+  /* RESET FORM */
   taskName.value = "";
   taskLink.value = "";
   comments.value = "";
@@ -146,6 +156,7 @@ function addToHistory(task){
 
   const div = document.createElement("div");
   div.className = "task-item";
+
   div.innerHTML = `
     <strong>${task.date}</strong> | ${task.userName}<br>
     ${task.taskName}<br>
@@ -153,6 +164,6 @@ function addToHistory(task){
     ${task.taskLink ? `🔗 <a href="${task.taskLink}" target="_blank">Open Link</a><br>` : ""}
     ${task.comments ? `📝 ${task.comments}` : ""}
   `;
+
   historyList.prepend(div);
 }
-
